@@ -5,7 +5,11 @@ CREATE TABLE IF NOT EXISTS `tbl_user` (
     `stu_num` VARCHAR(10) NOT NULL,
     `user_role` VARCHAR(10) NOT NULL,
     `password` CHAR(60) NOT NULL,
-    PRIMARY KEY (`id`)
+    `conference_member_id` BIGINT,
+    `lecture_member_id` BIGINT,
+     PRIMARY KEY (`id`),
+     CONSTRAINT `FK_tbl_conference_member_TO_tbl_user_1` FOREIGN KEY (`conference_member_id`) REFERENCES `tbl_conference_member`(`id`),
+     CONSTRAINT `FK_tbl_lecture_member_TO_tbl_user_1` FOREIGN KEY (`lecture_member_id`) REFERENCES `tbl_lecture_member`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `tbl_conference_request` (
