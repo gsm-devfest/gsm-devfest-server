@@ -4,7 +4,7 @@ import gsm.devfest.domain.user.enums.UserRole;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table(name = "tbl")
+@Table(name = "tbl_user")
 public class User {
 
     @Id

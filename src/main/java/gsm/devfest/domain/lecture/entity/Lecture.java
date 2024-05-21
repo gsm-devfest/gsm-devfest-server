@@ -23,5 +23,5 @@ public class Lecture {
 
     private LocalDateTime endRegisterDate;
 
-    private Long userId;
+    private String presenterName;
 }
