@@ -1,5 +1,6 @@
 package gsm.devfest.global.config;
 
+import lombok.RequiredArgsConstructor;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -10,11 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 @Configuration
-@ConfigurationProperties(prefix = "spring.data.redis")
 public class RedisConfig {
 
-    private String host;
-    private int port;
+    private String host = "localhost";
+    private Integer port = 6379;
 
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
