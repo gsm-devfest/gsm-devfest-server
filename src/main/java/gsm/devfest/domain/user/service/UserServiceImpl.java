@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public Mono<Void> saveUser(CreateUserRequest request) {
-        return userRepository.save(request.toEntityStudent()).then();
+        return userRepository.save(request.toEntity()).then();
     }
 
     @Override

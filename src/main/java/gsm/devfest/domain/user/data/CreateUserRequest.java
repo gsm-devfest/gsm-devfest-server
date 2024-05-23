@@ -13,7 +13,7 @@ public class CreateUserRequest {
     private final String stuNum;
     private final UserRole role;
 
-    public User toEntityStudent() {
+    public User toEntity() {
         return User.builder()
                 .name(name)
                 .email(email)
