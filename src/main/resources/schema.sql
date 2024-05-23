@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS `tbl_user` (
                                           `email` VARCHAR(40) NOT NULL,
                                           `stu_num` VARCHAR(10) NOT NULL,
                                           `user_role` VARCHAR(10) NOT NULL,
-                                          `password` CHAR(60) NOT NULL,
                                           PRIMARY KEY (`id`)
 );
 

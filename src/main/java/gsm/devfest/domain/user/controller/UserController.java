@@ -21,13 +21,12 @@ public class UserController {
     @GetMapping("/{id}")
     public Mono<ResponseEntity<UserResponse>> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
-                .map(response -> ResponseEntity.ok().body(response));
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping
-    public Flux<ResponseEntity<UserResponse>> getAllUsers() {
-        return userService.getAllUsers()
-                .map(response -> ResponseEntity.ok().body(response));
+    public ResponseEntity<Flux<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @PostMapping
