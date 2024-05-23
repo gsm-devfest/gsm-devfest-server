@@ -7,5 +7,6 @@ import reactor.core.publisher.Mono;
 
 public interface UserService {
     Mono<Void> saveUser(CreateUserRequest request);
+    Mono<UserResponse> getUserById(Long id);
     Flux<UserResponse> getAllUsers();
 }
