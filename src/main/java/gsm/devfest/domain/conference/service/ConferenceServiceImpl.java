@@ -4,10 +4,12 @@ import gsm.devfest.domain.conference.data.ConferenceDateRequest;
 import gsm.devfest.domain.conference.data.ConferenceResponse;
 import gsm.devfest.domain.conference.data.RegisterConferencePresenterRequest;
 import gsm.devfest.domain.conference.entity.Conference;
+import gsm.devfest.domain.conference.entity.ConferenceMember;
 import gsm.devfest.domain.conference.entity.ConferenceRequest;
 import gsm.devfest.domain.conference.repository.ConferenceMemberRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRequestRepository;
+import gsm.devfest.domain.conference.validator.ConferenceValidator;
 import gsm.devfest.domain.user.repository.UserRepository;
 import gsm.devfest.global.error.BasicException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class ConferenceServiceImpl implements ConferenceService {
     private final UserRepository userRepository;
     private final ConferenceRequestRepository conferenceRequestRepository;
     private final ConferenceMemberRepository conferenceMemberRepository;
+    private final ConferenceValidator conferenceValidator;
 
     @Override
     public Mono<Long> registerConferencePresenter(RegisterConferencePresenterRequest request) {
@@ -51,8 +54,23 @@ public class ConferenceServiceImpl implements ConferenceService {
     }
 
     @Override
-    public Mono<Long> registerConference(Long conferenceId) {
-        return null;
+    public Mono<Long> registerConference(Long conferenceId, Long userId) {
+        return conferenceRepository.findById(conferenceId)
+                .switchIfEmpty(Mono.error(new BasicException("Not Found Conference", HttpStatus.NOT_FOUND)))
+                .flatMap(conferenceValidator::validateDate)
+                .flatMap(entity -> conferenceValidator.validateAlreadyRegistered(entity, userId))
+                .flatMap(conferenceValidator::validateLimit)
+                .flatMap(entity -> saveConferenceMember(entity, userId))
+                .map(ConferenceMember::getId);
+    }
+
+
+    private Mono<ConferenceMember> saveConferenceMember(Conference conference, Long userId) {
+        ConferenceMember member = ConferenceMember.builder()
+                .memberId(userId)
+                .conferenceId(conference.getId())
+                .build();
+        return conferenceMemberRepository.save(member);
     }
 
     @Override

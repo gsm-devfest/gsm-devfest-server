@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public interface ConferenceService {
     Mono<Long> registerConferencePresenter(RegisterConferencePresenterRequest request);
     Mono<Long> acceptConference(Long requestId, ConferenceDateRequest request);
-    Mono<Long> registerConference(Long conferenceId);
+    Mono<Long> registerConference(Long conferenceId, Long userId);
     Mono<ConferenceResponse> getConferenceById(Long conferenceId);
     Flux<ConferenceResponse> getConferences();
 }

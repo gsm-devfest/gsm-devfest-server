@@ -23,6 +23,10 @@ public class Lecture {
 
     private String section;
 
+    private Integer limitCount;
+
+    private Integer memberCount;
+
     private LocalDate lectureDate;
 
     private LocalDate startRegisterDate;
