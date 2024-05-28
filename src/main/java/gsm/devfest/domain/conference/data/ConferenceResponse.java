@@ -1,11 +1,13 @@
 package gsm.devfest.domain.conference.data;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
 @RequiredArgsConstructor
 public class ConferenceResponse {
 
@@ -15,11 +17,15 @@ public class ConferenceResponse {
 
     private final String content;
 
-    private LocalDateTime conferenceDate;
+    private final Integer limitCount;
 
-    private LocalDateTime startRegisterDate;
+    private final Integer memberCount;
 
-    private LocalDateTime endRegisterDate;
+    private final LocalDateTime conferenceDate;
 
-    private Long userId;
+    private final LocalDateTime startRegisterDate;
+
+    private final LocalDateTime endRegisterDate;
+
+    private final Long userId;
 }

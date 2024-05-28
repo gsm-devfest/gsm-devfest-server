@@ -11,7 +11,6 @@ import gsm.devfest.domain.conference.repository.ConferenceRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRequestRepository;
 import gsm.devfest.domain.conference.validator.ConferenceRequestValidator;
 import gsm.devfest.domain.conference.validator.ConferenceValidator;
-import gsm.devfest.domain.user.repository.UserRepository;
 import gsm.devfest.global.error.BasicException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -61,6 +60,31 @@ public class ConferenceServiceImpl implements ConferenceService {
                 .map(ConferenceMember::getId);
     }
 
+    @Override
+    public Mono<ConferenceResponse> getConferenceById(Long conferenceId) {
+        return conferenceRepository.findById(conferenceId)
+                .switchIfEmpty(Mono.error(new BasicException("Not Found Conference", HttpStatus.NOT_FOUND)))
+                .map(this::convertToConferenceResponse);
+    }
+
+    private ConferenceResponse convertToConferenceResponse(Conference conference) {
+        return ConferenceResponse.builder()
+                .id(conference.getId())
+                .title(conference.getTitle())
+                .content(conference.getContent())
+                .limitCount(conference.getLimitCount())
+                .memberCount(conference.getMemberCount())
+                .conferenceDate(conference.getConferenceDate())
+                .startRegisterDate(conference.getStartRegisterDate())
+                .endRegisterDate(conference.getEndRegisterDate())
+                .userId(conference.getUserId())
+                .build();
+    }
+
+    @Override
+    public Flux<ConferenceResponse> getConferences() {
+        return conferenceRepository.findAll().map(this::convertToConferenceResponse);
+    }
 
     private Mono<ConferenceMember> saveConferenceMember(Conference conference, Long userId) {
         ConferenceMember member = ConferenceMember.builder()
@@ -68,15 +92,5 @@ public class ConferenceServiceImpl implements ConferenceService {
                 .conferenceId(conference.getId())
                 .build();
         return conferenceMemberRepository.save(member);
-    }
-
-    @Override
-    public Mono<ConferenceResponse> getConferenceById(Long conferenceId) {
-        return null;
-    }
-
-    @Override
-    public Flux<ConferenceResponse> getConferences() {
-        return null;
     }
 }
