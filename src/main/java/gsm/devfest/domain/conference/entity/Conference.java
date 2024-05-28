@@ -21,6 +21,10 @@ public class Conference {
 
     private String content;
 
+    private Integer limitCount;
+
+    private Integer memberCount;
+
     private LocalDateTime conferenceDate;
 
     private LocalDateTime startRegisterDate;
