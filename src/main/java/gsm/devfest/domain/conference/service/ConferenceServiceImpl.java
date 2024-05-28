@@ -1,7 +1,9 @@
 package gsm.devfest.domain.conference.service;
 
+import gsm.devfest.domain.conference.data.ConferenceDateRequest;
 import gsm.devfest.domain.conference.data.ConferenceResponse;
 import gsm.devfest.domain.conference.data.RegisterConferencePresenterRequest;
+import gsm.devfest.domain.conference.entity.Conference;
 import gsm.devfest.domain.conference.entity.ConferenceRequest;
 import gsm.devfest.domain.conference.repository.ConferenceMemberRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRepository;
@@ -35,8 +37,17 @@ public class ConferenceServiceImpl implements ConferenceService {
     }
 
     @Override
-    public Mono<Long> acceptConference(Long requestId) {
-        return null;
+    public Mono<Long> acceptConference(Long requestId, ConferenceDateRequest request) {
+        return conferenceRequestRepository.findById(requestId)
+                .switchIfEmpty(Mono.error(new BasicException("Not Found ConferenceRequest", HttpStatus.NOT_FOUND)))
+                .flatMap(entity -> {
+                    Mono<Boolean> isExistsMono = conferenceRepository.existsByUserId(entity.getUserId());
+                    return isExistsMono.flatMap(isExists -> {
+                        if(Boolean.TRUE.equals(isExists)) return Mono.error(new BasicException("Already Exists Conference User", HttpStatus.BAD_REQUEST));
+                        else return Mono.just(entity);
+                    });
+                }).flatMap(conferenceRequest -> conferenceRepository.save(conferenceRequest.toConference(request.getConferenceDate(), request.getStartRegisterDate(), request.getEndRegisterDate())))
+                .map(Conference::getId);
     }
 
     @Override
