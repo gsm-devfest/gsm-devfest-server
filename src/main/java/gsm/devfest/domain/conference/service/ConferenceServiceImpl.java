@@ -2,11 +2,14 @@ package gsm.devfest.domain.conference.service;
 
 import gsm.devfest.domain.conference.data.ConferenceResponse;
 import gsm.devfest.domain.conference.data.RegisterConferencePresenterRequest;
+import gsm.devfest.domain.conference.entity.ConferenceRequest;
 import gsm.devfest.domain.conference.repository.ConferenceMemberRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRequestRepository;
 import gsm.devfest.domain.user.repository.UserRepository;
+import gsm.devfest.global.error.BasicException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,10 +25,13 @@ public class ConferenceServiceImpl implements ConferenceService {
 
     @Override
     public Mono<Long> registerConferencePresenter(RegisterConferencePresenterRequest request) {
-
-
-
-        return null;
+        return conferenceRequestRepository.existsByUserId(request.getUserId())
+                .flatMap(isExists -> {
+                    if(isExists) return Mono.error(new BasicException("Already Exists Conference Request User", HttpStatus.BAD_REQUEST));
+                    else return Mono.just(request);
+                })
+                .flatMap(conferenceRequest -> conferenceRequestRepository.save(conferenceRequest.toEntity()))
+                .map(ConferenceRequest::getId);
     }
 
     @Override
