@@ -9,6 +9,7 @@ import gsm.devfest.domain.conference.entity.ConferenceRequest;
 import gsm.devfest.domain.conference.repository.ConferenceMemberRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRepository;
 import gsm.devfest.domain.conference.repository.ConferenceRequestRepository;
+import gsm.devfest.domain.conference.validator.ConferenceRequestValidator;
 import gsm.devfest.domain.conference.validator.ConferenceValidator;
 import gsm.devfest.domain.user.repository.UserRepository;
 import gsm.devfest.global.error.BasicException;
@@ -23,18 +24,15 @@ import reactor.core.publisher.Mono;
 public class ConferenceServiceImpl implements ConferenceService {
 
     private final ConferenceRepository conferenceRepository;
-    private final UserRepository userRepository;
     private final ConferenceRequestRepository conferenceRequestRepository;
     private final ConferenceMemberRepository conferenceMemberRepository;
     private final ConferenceValidator conferenceValidator;
+    private final ConferenceRequestValidator conferenceRequestValidator;
 
     @Override
     public Mono<Long> registerConferencePresenter(RegisterConferencePresenterRequest request) {
         return conferenceRequestRepository.existsByUserId(request.getUserId())
-                .flatMap(isExists -> {
-                    if(isExists) return Mono.error(new BasicException("Already Exists Conference Request User", HttpStatus.BAD_REQUEST));
-                    else return Mono.just(request);
-                })
+                .flatMap(isExists -> conferenceRequestValidator.isExists(isExists, request))
                 .flatMap(conferenceRequest -> conferenceRequestRepository.save(conferenceRequest.toEntity()))
                 .map(ConferenceRequest::getId);
     }
@@ -43,13 +41,12 @@ public class ConferenceServiceImpl implements ConferenceService {
     public Mono<Long> acceptConference(Long requestId, ConferenceDateRequest request) {
         return conferenceRequestRepository.findById(requestId)
                 .switchIfEmpty(Mono.error(new BasicException("Not Found ConferenceRequest", HttpStatus.NOT_FOUND)))
-                .flatMap(entity -> {
-                    Mono<Boolean> isExistsMono = conferenceRepository.existsByUserId(entity.getUserId());
-                    return isExistsMono.flatMap(isExists -> {
-                        if(Boolean.TRUE.equals(isExists)) return Mono.error(new BasicException("Already Exists Conference User", HttpStatus.BAD_REQUEST));
-                        else return Mono.just(entity);
-                    });
-                }).flatMap(conferenceRequest -> conferenceRepository.save(conferenceRequest.toConference(request.getConferenceDate(), request.getStartRegisterDate(), request.getEndRegisterDate())))
+                .flatMap(conferenceRequestValidator::isExistsMember)
+                .flatMap(conferenceRequest -> conferenceRepository.save(conferenceRequest.toConference(
+                        request.getConferenceDate(),
+                        request.getStartRegisterDate(),
+                        request.getEndRegisterDate()
+                )))
                 .map(Conference::getId);
     }
 
