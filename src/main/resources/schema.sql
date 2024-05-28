@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `tbl_lecture` (
                                              `content` VARCHAR(1000) NOT NULL,
                                              `presenter_name` VARCHAR(50) NOT NULL,
                                              `section` VARCHAR(5) NOT NULL,
-                                             `conference_date` DATE NOT NULL,
+                                             `lecture_date` DATE NOT NULL,
                                              `start_register_date` DATE NOT NULL,
                                              `end_register_date` DATE NOT NULL,
                                              PRIMARY KEY (`id`)
