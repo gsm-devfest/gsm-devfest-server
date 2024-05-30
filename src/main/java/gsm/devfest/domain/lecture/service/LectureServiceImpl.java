@@ -1,13 +1,12 @@
 package gsm.devfest.domain.lecture.service;
 
 import gsm.devfest.domain.lecture.data.CreateLectureRequest;
-import gsm.devfest.domain.lecture.data.ReserveLectureRequest;
+import gsm.devfest.domain.lecture.data.RegisterLectureRequest;
 import gsm.devfest.domain.lecture.entity.Lecture;
 import gsm.devfest.domain.lecture.entity.LectureMember;
 import gsm.devfest.domain.lecture.repository.LectureMemberRepository;
 import gsm.devfest.domain.lecture.repository.LectureRepository;
 import gsm.devfest.domain.lecture.validator.LectureValidator;
-import gsm.devfest.domain.user.repository.UserRepository;
 import gsm.devfest.global.error.BasicException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ public class LectureServiceImpl implements LectureService {
     }
 
     @Override
-    public Mono<Long> reserveLecture(ReserveLectureRequest request) {
+    public Mono<Long> registerLecture(RegisterLectureRequest request) {
         return lectureRepository.findById(request.getLectureId())
                 .switchIfEmpty(Mono.error(new BasicException("Lecture Not Found", HttpStatus.NOT_FOUND)))
                 .flatMap(entity -> lectureValidator.isExistLectureMember(entity, request.getUserId()))

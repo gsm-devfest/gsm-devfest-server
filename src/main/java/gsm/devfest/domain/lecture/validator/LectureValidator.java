@@ -1,7 +1,5 @@
 package gsm.devfest.domain.lecture.validator;
 
-import gsm.devfest.domain.conference.entity.Conference;
-import gsm.devfest.domain.lecture.data.ReserveLectureRequest;
 import gsm.devfest.domain.lecture.entity.Lecture;
 import gsm.devfest.domain.lecture.repository.LectureMemberRepository;
 import gsm.devfest.global.error.BasicException;

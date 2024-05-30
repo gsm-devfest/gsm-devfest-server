@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class ReserveLectureRequest {
+public class RegisterLectureRequest {
 
     private final Long lectureId;
     private final Long userId;
