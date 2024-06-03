@@ -1,6 +1,7 @@
 package gsm.devfest.domain.lecture.controller;
 
 import gsm.devfest.domain.lecture.data.CreateLectureRequest;
+import gsm.devfest.domain.lecture.data.RegisterLectureRequest;
 import gsm.devfest.domain.lecture.service.LectureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,11 @@ public class LectureController {
     public Mono<ResponseEntity<Void>> createLecture(@RequestBody CreateLectureRequest request) {
         return lectureService.createLecture(request)
                 .map(response -> ResponseEntity.created(URI.create("/lecture")).body(response));
+    }
+
+    @PostMapping("/register")
+    public Mono<ResponseEntity<Long>> registerLecture(@RequestBody RegisterLectureRequest request) {
+        return lectureService.registerLecture(request)
+                .map(ResponseEntity::ok);
     }
 }
