@@ -4,8 +4,6 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDate;
-
 @Getter
 @Builder
 @ToString
@@ -20,6 +18,4 @@ public class LectureMember {
     private Long memberId;
 
     private Long lectureId;
-
-    private LocalDate lectureDate;
 }
