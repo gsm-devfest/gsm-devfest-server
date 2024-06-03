@@ -2,6 +2,7 @@ package gsm.devfest.domain.lecture.validator;
 
 import gsm.devfest.domain.lecture.entity.Lecture;
 import gsm.devfest.domain.lecture.repository.LectureMemberRepository;
+import gsm.devfest.domain.lecture.repository.LectureRepository;
 import gsm.devfest.global.error.BasicException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 public class LectureValidator {
 
     private final LectureMemberRepository lectureMemberRepository;
+    private final LectureRepository lectureRepository;
 
     public Mono<Lecture> isExistLectureMember(Lecture entity, Long userId) {
         return lectureMemberRepository.existsByLectureIdAndMemberId(entity.getId(), userId)
@@ -28,9 +30,9 @@ public class LectureValidator {
     }
 
     public Mono<Lecture> isExistSection(Lecture entity, Long userId) {
-        return lectureMemberRepository.existsByMemberIdAndLectureDate(userId, entity.getLectureDate())
+        return isAlreadyRegisterSection(entity, userId)
                 .flatMap(isExist -> {
-                    if (Boolean.TRUE.equals(isExist)) {
+                    if (isExist) {
                         return Mono.error(new BasicException("Already Exist Section", HttpStatus.BAD_REQUEST));
                     } else {
                         return Mono.just(entity);
@@ -56,11 +58,21 @@ public class LectureValidator {
 
     private boolean isValidDate(Lecture lecture) {
         LocalDate current = LocalDate.now();
+        System.out.println(current.isBefore(lecture.getEndRegisterDate()));
+        System.out.println(current.isAfter(lecture.getStartRegisterDate()));
         return current.isBefore(lecture.getEndRegisterDate()) && current.isAfter(lecture.getStartRegisterDate());
     }
 
     private boolean isValidLimit(Lecture lecture) {
         return lecture.getLimitCount() > lecture.getMemberCount() + 1;
+    }
+
+    private Mono<Boolean> isAlreadyRegisterSection(Lecture lecture, Long userId) {
+        return lectureRepository.findAllByLectureDate(lecture.getLectureDate())
+                .map(Lecture::getId)
+                .filter(lectureId -> !lecture.getId().equals(lectureId))
+                .flatMap(id -> lectureMemberRepository.existsByLectureIdAndMemberId(id, userId))
+                .next();
     }
 
 }

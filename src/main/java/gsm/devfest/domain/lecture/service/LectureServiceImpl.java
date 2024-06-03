@@ -33,16 +33,15 @@ public class LectureServiceImpl implements LectureService {
                 .flatMap(entity -> lectureValidator.isExistLectureMember(entity, request.getUserId()))
                 .flatMap(lectureValidator::validateDate)
                 .flatMap(lectureValidator::validateLimit)
-                .flatMap(entity -> lectureValidator.isExistSection(entity, request.getUserId()))
-                .flatMap(entity -> saveLectureMember(entity, request.getUserId()))
-                .map(LectureMember::getId);
+                .flatMap(entity -> lectureValidator.isExistSection(entity, request.getUserId())
+                .flatMap(lecture -> saveLectureMember(lecture, request.getUserId()))
+                .map(LectureMember::getId));
     }
 
     public Mono<LectureMember> saveLectureMember(Lecture lecture, Long userId) {
         LectureMember lectureMember = LectureMember.builder()
                 .memberId(userId)
                 .lectureId(lecture.getId())
-                .lectureDate(lecture.getLectureDate())
                 .build();
         return lectureMemberRepository.save(lectureMember);
     }
