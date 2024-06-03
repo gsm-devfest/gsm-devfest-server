@@ -1,6 +1,7 @@
 package gsm.devfest.domain.lecture.service;
 
 import gsm.devfest.domain.lecture.data.CreateLectureRequest;
+import gsm.devfest.domain.lecture.data.LectureResponse;
 import gsm.devfest.domain.lecture.data.RegisterLectureRequest;
 import gsm.devfest.domain.lecture.entity.Lecture;
 import gsm.devfest.domain.lecture.entity.LectureMember;
@@ -11,6 +12,7 @@ import gsm.devfest.global.error.BasicException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -36,6 +38,38 @@ public class LectureServiceImpl implements LectureService {
                 .flatMap(entity -> lectureValidator.isExistSection(entity, request.getUserId())
                 .flatMap(lecture -> saveLectureMember(lecture, request.getUserId()))
                 .map(LectureMember::getId));
+    }
+
+    @Override
+    public Mono<LectureResponse> getLectureById(Long lectureId) {
+        return lectureRepository.findById(lectureId)
+                .switchIfEmpty(Mono.error(new BasicException("Lecture Not Found", HttpStatus.NOT_FOUND)))
+                .map(this::convertToLectureResponse);
+    }
+
+    @Override
+    public Flux<LectureResponse> getLecture() {
+        return lectureRepository.findAll().map(this::convertToLectureResponse);
+    }
+
+    @Override
+    public Mono<Void> deleteLecture(Long lectureId) {
+        return lectureRepository.deleteById(lectureId);
+    }
+
+    public LectureResponse convertToLectureResponse(Lecture lecture) {
+        return LectureResponse.builder()
+                .id(lecture.getId())
+                .title(lecture.getTitle())
+                .content(lecture.getContent())
+                .section(lecture.getSection())
+                .limitCount(lecture.getLimitCount())
+                .memberCount(lecture.getMemberCount())
+                .lectureDate(lecture.getLectureDate())
+                .startRegisterDate(lecture.getStartRegisterDate())
+                .endRegisterDate(lecture.getEndRegisterDate())
+                .presenterName(lecture.getPresenterName())
+                .build();
     }
 
     public Mono<LectureMember> saveLectureMember(Lecture lecture, Long userId) {
