@@ -13,6 +13,8 @@ public class CreateLectureRequest {
     private final String title;
     private final String content;
     private final String section;
+    private final Integer limitCount;
+    private final Integer memberCount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private final LocalDate lectureDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
@@ -26,6 +28,8 @@ public class CreateLectureRequest {
                 .title(title)
                 .content(content)
                 .section(section)
+                .limitCount(limitCount)
+                .memberCount(memberCount)
                 .lectureDate(lectureDate)
                 .startRegisterDate(startResisterDate)
                 .endRegisterDate(endResisterDate)
