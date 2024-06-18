@@ -45,5 +45,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 
+	// aop
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.108.Final:osx-aarch_64'
 }
