@@ -1,5 +1,6 @@
 package gsm.devfest.domain.lecture.service;
 
+import gsm.devfest.common.lock.annotation.DistributedLock;
 import gsm.devfest.domain.lecture.data.CreateLectureRequest;
 import gsm.devfest.domain.lecture.data.LectureResponse;
 import gsm.devfest.domain.lecture.data.RegisterLectureRequest;
@@ -29,6 +30,7 @@ public class LectureServiceImpl implements LectureService {
     }
 
     @Override
+    @DistributedLock(key = "#request.lectureId")
     public Mono<Long> registerLecture(RegisterLectureRequest request) {
         return lectureRepository.findById(request.getLectureId())
                 .switchIfEmpty(Mono.error(new BasicException("Lecture Not Found", HttpStatus.NOT_FOUND)))
