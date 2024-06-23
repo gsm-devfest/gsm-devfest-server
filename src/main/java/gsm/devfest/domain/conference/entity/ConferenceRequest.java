@@ -4,7 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -23,10 +23,12 @@ public class ConferenceRequest {
 
     private String  content;
 
-    public Conference toConference(LocalDateTime conferenceDate, LocalDateTime startRegisterDate, LocalDateTime endRegisterDate) {
+    public Conference toConference(Integer limitCount, Integer memberCount, LocalDate conferenceDate, LocalDate startRegisterDate, LocalDate endRegisterDate) {
         return Conference.builder()
                 .title(title)
                 .content(content)
+                .limitCount(limitCount)
+                .memberCount(memberCount)
                 .conferenceDate(conferenceDate)
                 .startRegisterDate(startRegisterDate)
                 .endRegisterDate(endRegisterDate)

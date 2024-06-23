@@ -66,6 +66,12 @@ public class DistributedLockAspect {
                 throw new BasicException("LectureId must not be null", HttpStatus.BAD_REQUEST);
             }
             return "lecture" + lectureId;
+        } else if (arg instanceof Long) {
+            Long conferenceId = (Long) arg;
+            if (conferenceId == null) {
+                throw new BasicException("ConferenceId must not be null", HttpStatus.BAD_REQUEST);
+            }
+            return "conference" + conferenceId;
         } else {
             throw new BasicException("Unsupported argument type: " + arg.getClass().getName(), HttpStatus.BAD_REQUEST);
         }

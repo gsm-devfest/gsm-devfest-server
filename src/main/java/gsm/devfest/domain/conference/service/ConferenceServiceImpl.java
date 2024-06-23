@@ -1,6 +1,7 @@
 package gsm.devfest.domain.conference.service;
 
-import gsm.devfest.domain.conference.data.ConferenceDateRequest;
+import gsm.devfest.common.lock.annotation.DistributedLock;
+import gsm.devfest.domain.conference.data.AcceptConferenceRequest;
 import gsm.devfest.domain.conference.data.ConferenceResponse;
 import gsm.devfest.domain.conference.data.RegisterConferencePresenterRequest;
 import gsm.devfest.domain.conference.entity.Conference;
@@ -37,11 +38,13 @@ public class ConferenceServiceImpl implements ConferenceService {
     }
 
     @Override
-    public Mono<Long> acceptConference(Long requestId, ConferenceDateRequest request) {
+    public Mono<Long> acceptConference(Long requestId, AcceptConferenceRequest request) {
         return conferenceRequestRepository.findById(requestId)
                 .switchIfEmpty(Mono.error(new BasicException("Not Found ConferenceRequest", HttpStatus.NOT_FOUND)))
                 .flatMap(conferenceRequestValidator::isExistsMember)
                 .flatMap(conferenceRequest -> conferenceRepository.save(conferenceRequest.toConference(
+                        request.getLimitCount(),
+                        request.getMemberCount(),
                         request.getConferenceDate(),
                         request.getStartRegisterDate(),
                         request.getEndRegisterDate()
@@ -50,12 +53,14 @@ public class ConferenceServiceImpl implements ConferenceService {
     }
 
     @Override
+    @DistributedLock(key = "#conferenceId")
     public Mono<Long> registerConference(Long conferenceId, Long userId) {
         return conferenceRepository.findById(conferenceId)
                 .switchIfEmpty(Mono.error(new BasicException("Not Found Conference", HttpStatus.NOT_FOUND)))
                 .flatMap(conferenceValidator::validateDate)
                 .flatMap(entity -> conferenceValidator.validateAlreadyRegistered(entity, userId))
                 .flatMap(conferenceValidator::validateLimit)
+                .flatMap(entity -> updateMemberCount(entity))
                 .flatMap(entity -> saveConferenceMember(entity, userId))
                 .map(ConferenceMember::getId);
     }
@@ -92,5 +97,20 @@ public class ConferenceServiceImpl implements ConferenceService {
                 .conferenceId(conference.getId())
                 .build();
         return conferenceMemberRepository.save(member);
+    }
+
+    private Mono<Conference> updateMemberCount(Conference entity) {
+        Conference conference = new Conference(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getContent(),
+                entity.getLimitCount(),
+                entity.getMemberCount() + 1,
+                entity.getConferenceDate(),
+                entity.getStartRegisterDate(),
+                entity.getEndRegisterDate(),
+                entity.getUserId()
+        );
+        return conferenceRepository.save(conference);
     }
 }

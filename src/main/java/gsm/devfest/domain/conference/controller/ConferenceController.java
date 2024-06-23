@@ -1,6 +1,6 @@
 package gsm.devfest.domain.conference.controller;
 
-import gsm.devfest.domain.conference.data.ConferenceDateRequest;
+import gsm.devfest.domain.conference.data.AcceptConferenceRequest;
 import gsm.devfest.domain.conference.data.ConferenceResponse;
 import gsm.devfest.domain.conference.data.RegisterConferencePresenterRequest;
 import gsm.devfest.domain.conference.service.ConferenceService;
@@ -26,7 +26,7 @@ public class ConferenceController {
     }
 
     @PostMapping("/{request_id}")
-    public Mono<ResponseEntity<Long>> acceptConference(@PathVariable("request_id") Long requestId, @RequestBody ConferenceDateRequest request) {
+    public Mono<ResponseEntity<Long>> acceptConference(@PathVariable("request_id") Long requestId, @RequestBody AcceptConferenceRequest request) {
         return conferenceService.acceptConference(requestId, request)
                 .map(ResponseEntity::ok);
     }

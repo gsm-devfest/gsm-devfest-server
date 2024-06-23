@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -21,11 +21,11 @@ public class ConferenceResponse {
 
     private final Integer memberCount;
 
-    private final LocalDateTime conferenceDate;
+    private final LocalDate conferenceDate;
 
-    private final LocalDateTime startRegisterDate;
+    private final LocalDate startRegisterDate;
 
-    private final LocalDateTime endRegisterDate;
+    private final LocalDate endRegisterDate;
 
     private final Long userId;
 }

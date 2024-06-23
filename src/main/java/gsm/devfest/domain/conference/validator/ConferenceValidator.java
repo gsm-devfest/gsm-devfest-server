@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -30,11 +30,14 @@ public class ConferenceValidator {
     }
 
     public Mono<Conference> validateAlreadyRegistered(Conference entity, Long userId) {
-        if (isAlreadyRegister(entity.getId(), userId)) {
-            return Mono.error(new BasicException(ALREADY_REGISTER_USER, HttpStatus.BAD_REQUEST));
-        } else {
-            return Mono.just(entity);
-        }
+        return conferenceMemberRepository.existsByMemberIdAndConferenceId(userId, entity.getId())
+                .flatMap(isExist -> {
+                    if (Boolean.TRUE.equals(isExist)) {
+                        return Mono.error(new BasicException(ALREADY_REGISTER_USER, HttpStatus.BAD_REQUEST));
+                    } else {
+                        return Mono.just(entity);
+                    }
+                });
     }
 
     public Mono<Conference> validateLimit(Conference entity) {
@@ -50,11 +53,7 @@ public class ConferenceValidator {
     }
 
     private boolean isValidDate(Conference conference) {
-        LocalDateTime current = LocalDateTime.now();
+        LocalDate current = LocalDate.now();
         return current.isBefore(conference.getEndRegisterDate()) && current.isAfter(conference.getStartRegisterDate());
-    }
-
-    private boolean isAlreadyRegister(Long conferenceId, Long userId) {
-        return Boolean.TRUE.equals(conferenceMemberRepository.existsByMemberIdAndConferenceId(userId, conferenceId).block());
     }
 }
