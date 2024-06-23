@@ -60,7 +60,7 @@ public class ConferenceServiceImpl implements ConferenceService {
                 .flatMap(conferenceValidator::validateDate)
                 .flatMap(entity -> conferenceValidator.validateAlreadyRegistered(entity, userId))
                 .flatMap(conferenceValidator::validateLimit)
-                .flatMap(entity -> updateMemberCount(entity))
+                .flatMap(this::updateMemberCount)
                 .flatMap(entity -> saveConferenceMember(entity, userId))
                 .map(ConferenceMember::getId);
     }
