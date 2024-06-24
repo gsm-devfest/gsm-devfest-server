@@ -58,8 +58,6 @@ public class LectureValidator {
 
     private boolean isValidDate(Lecture lecture) {
         LocalDate current = LocalDate.now();
-        System.out.println(current.isBefore(lecture.getEndRegisterDate()));
-        System.out.println(current.isAfter(lecture.getStartRegisterDate()));
         return current.isBefore(lecture.getEndRegisterDate()) && current.isAfter(lecture.getStartRegisterDate());
     }
 
@@ -72,7 +70,8 @@ public class LectureValidator {
                 .map(Lecture::getId)
                 .filter(lectureId -> !lecture.getId().equals(lectureId))
                 .flatMap(id -> lectureMemberRepository.existsByLectureIdAndMemberId(id, userId))
-                .next();
+                .next()
+                .defaultIfEmpty(false);
     }
 
 }

@@ -1,5 +1,6 @@
 package gsm.devfest.domain.lecture.service;
 
+import gsm.devfest.common.lock.annotation.DistributedLock;
 import gsm.devfest.domain.lecture.data.CreateLectureRequest;
 import gsm.devfest.domain.lecture.data.LectureResponse;
 import gsm.devfest.domain.lecture.data.RegisterLectureRequest;
@@ -29,6 +30,7 @@ public class LectureServiceImpl implements LectureService {
     }
 
     @Override
+    @DistributedLock(key = "#request.lectureId")
     public Mono<Long> registerLecture(RegisterLectureRequest request) {
         return lectureRepository.findById(request.getLectureId())
                 .switchIfEmpty(Mono.error(new BasicException("Lecture Not Found", HttpStatus.NOT_FOUND)))
@@ -36,6 +38,7 @@ public class LectureServiceImpl implements LectureService {
                 .flatMap(lectureValidator::validateDate)
                 .flatMap(lectureValidator::validateLimit)
                 .flatMap(entity -> lectureValidator.isExistSection(entity, request.getUserId())
+                .flatMap(this::updateMemberCount)
                 .flatMap(lecture -> saveLectureMember(lecture, request.getUserId()))
                 .map(LectureMember::getId));
     }
@@ -78,6 +81,22 @@ public class LectureServiceImpl implements LectureService {
                 .lectureId(lecture.getId())
                 .build();
         return lectureMemberRepository.save(lectureMember);
+    }
+
+    public Mono<Lecture> updateMemberCount(Lecture entity) {
+        Lecture lecture = new Lecture(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getContent(),
+                entity.getSection(),
+                entity.getLimitCount(),
+                entity.getMemberCount() + 1,
+                entity.getLectureDate(),
+                entity.getStartRegisterDate(),
+                entity.getEndRegisterDate(),
+                entity.getPresenterName()
+        );
+        return lectureRepository.save(lecture);
     }
 
 

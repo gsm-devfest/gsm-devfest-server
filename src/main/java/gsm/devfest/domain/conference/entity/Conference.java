@@ -4,7 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -25,11 +25,11 @@ public class Conference {
 
     private Integer memberCount;
 
-    private LocalDateTime conferenceDate;
+    private LocalDate conferenceDate;
 
-    private LocalDateTime startRegisterDate;
+    private LocalDate startRegisterDate;
 
-    private LocalDateTime endRegisterDate;
+    private LocalDate endRegisterDate;
 
     private Long userId;
 }
